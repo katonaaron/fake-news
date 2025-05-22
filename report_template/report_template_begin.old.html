@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Quick Sigma.js Example</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/2.4.0/sigma.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.25.4/graphology.umd.min.js"></script>
+</head>
+<body style="background: lightgrey">
+<div id="sigma-container" style="width: 800px; height: 600px; background: white"></div>
+<script>
+    const container = document.getElementById("sigma-container");
+
+    const graph = new graphology.Graph();
+
+    const RED = "#FA4F40";
+    const BLUE = "#727EE0";
+    const GREEN = "#5DB346";
+

@@ -1,0 +1,86 @@
+</script>
+<script>
+    const container = document.getElementById("sigma-container");
+
+    const graph = new graphology.Graph();
+
+    const RED = "#FA4F40";
+    const BLUE = "#727EE0";
+    const GREEN = "#5DB346";
+
+    document.getElementById("graph_id").innerText = data.id;
+    document.getElementById("graph_label").innerText = data.label;
+    document.getElementById("graph_prediction").innerText = data.prediction;
+    document.getElementById("graph_confidence").innerText = data.confidence;
+    document.getElementById("graph_title").innerText = data.title;
+    document.getElementById("graph_content").innerText = data.content;
+    document.getElementById("graph_title_annotations").innerText = data.title_annotations;
+    document.getElementById("graph_content_annotations").innerText = data.content_annotations;
+    document.getElementById("graph_fidPlus").innerText = data.fidPlus;
+    document.getElementById("graph_fidMinus").innerText = data.fidMinus;
+    document.getElementById("graph_unf").innerText = data.unf;
+
+    data.nodes.forEach(node => {
+        graph.addNode(node.id, {size: node.size, x:node.x, y:node.y, label: node.label, color: BLUE});
+    })
+
+    data.edges.forEach(edge => {
+        graph.addEdge(edge.s, edge.o, {type: "arrow", label: edge.label, size: edge.size});
+    })
+
+    const renderer = new Sigma(graph, container, {
+        renderEdgeLabels: true,
+    });
+
+    //
+  // Drag'n'drop feature
+  // ~~~~~~~~~~~~~~~~~~~
+  //
+
+  // State for drag'n'drop
+  let draggedNode = null;
+  let isDragging = false;
+
+  // On mouse down on a node
+  //  - we enable the drag mode
+  //  - save in the dragged node in the state
+  //  - highlight the node
+  //  - disable the camera so its state is not updated
+  renderer.on("downNode", (e) => {
+    isDragging = true;
+    draggedNode = e.node;
+    graph.setNodeAttribute(draggedNode, "highlighted", true);
+  });
+
+  // On mouse move, if the drag mode is enabled, we change the position of the draggedNode
+  renderer.getMouseCaptor().on("mousemovebody", (e) => {
+    if (!isDragging || !draggedNode) return;
+
+    // Get new position of node
+    const pos = renderer.viewportToGraph(e);
+
+    graph.setNodeAttribute(draggedNode, "x", pos.x);
+    graph.setNodeAttribute(draggedNode, "y", pos.y);
+
+    // Prevent sigma to move camera:
+    e.preventSigmaDefault();
+    e.original.preventDefault();
+    e.original.stopPropagation();
+  });
+
+  // On mouse up, we reset the autoscale and the dragging mode
+  renderer.getMouseCaptor().on("mouseup", () => {
+    if (draggedNode) {
+      graph.removeNodeAttribute(draggedNode, "highlighted");
+    }
+    isDragging = false;
+    draggedNode = null;
+  });
+
+  // Disable the autoscale at the first down interaction
+  renderer.getMouseCaptor().on("mousedown", () => {
+    if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
+  });
+</script>
+</body>
+</html>
